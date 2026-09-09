@@ -1,0 +1,140 @@
+// Prisma schema for the Event Ticketing platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ORGANIZER
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AttendanceStatus {
+  NOT_ATTENDED
+  ATTENDED
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(ORGANIZER)
+  // Deactivated admins can't sign in but are kept (not hard-deleted) so their
+  // history — events created, registrations reviewed, attendance scanned —
+  // stays intact instead of breaking foreign-key references.
+  disabledAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  events        Event[]        @relation("EventCreatedBy")
+  reviewedRegs  Registration[] @relation("ReviewedBy")
+  scannedAttendances Attendance[] @relation("ScannedBy")
+
+  @@map("admins")
+}
+
+model Event {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  description      String?
+  location         String?
+  startAt          DateTime
+  endAt            DateTime?
+  capacity         Int?
+  registrationOpen Boolean  @default(true)
+  bannerUrl        String?
+  createdById      String
+  createdBy        Admin    @relation("EventCreatedBy", fields: [createdById], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  registrations Registration[]
+
+  @@index([createdById])
+  @@map("events")
+}
+
+model Registration {
+  id             String             @id @default(cuid())
+  eventId        String
+  event          Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  fullName       String
+  email          String
+  phone          String?
+  organization   String?
+  notes          String?
+  status         RegistrationStatus @default(PENDING)
+  reviewedById   String?
+  reviewedBy     Admin?             @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt     DateTime?
+  rejectionReason String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  ticket Ticket?
+
+  @@index([eventId])
+  @@index([email])
+  @@unique([eventId, email])
+  @@map("registrations")
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  ticketCode     String       @unique // human-readable unique code, e.g. TCK-XXXXXXXX
+  qrToken        String       @unique // opaque signed token embedded in the QR code
+  registrationId String       @unique
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  emailSentAt    DateTime?
+  createdAt      DateTime     @default(now())
+
+  attendance Attendance?
+
+  @@map("tickets")
+}
+
+model SmtpSettings {
+  // Singleton row — the app always reads/writes id: "singleton".
+  id             String   @id @default("singleton")
+  host           String
+  port           Int      @default(587)
+  secure         Boolean  @default(false)
+  // Accept self-signed / otherwise unverifiable TLS certificates. Off by
+  // default; only needed for internal or self-hosted mail servers.
+  rejectUnauthorized Boolean @default(true)
+  username       String
+  password       String
+  fromName       String   @default("Event Ticketing")
+  fromEmail      String
+  updatedAt      DateTime @updatedAt
+  updatedByEmail String?
+
+  @@map("smtp_settings")
+}
+
+model Attendance {
+  id         String            @id @default(cuid())
+  ticketId   String            @unique
+  ticket     Ticket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  status     AttendanceStatus  @default(NOT_ATTENDED)
+  checkedInAt DateTime?
+  scannedById String?
+  scannedBy   Admin?           @relation("ScannedBy", fields: [scannedById], references: [id])
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@map("attendances")
+}
