@@ -5,7 +5,7 @@ approvals, QR-code tickets, email invitations, and on-site attendance scanning.
 
 ## Workflow
 
-```
+```text
 Admin creates/configures event
         v
 Admin shares the event's registration link
@@ -98,6 +98,18 @@ table), not in `.env` — no redeploy needed to change them, and they're only
 readable/writable by `SUPER_ADMIN` accounts. Use **Send test email** to verify
 before saving. Until this is configured, ticket/rejection emails will fail
 silently (logged server-side; the approval itself still succeeds).
+
+## Deploying with Docker
+
+See **[DOCKER.md](./DOCKER.md)** for a full, tested walkthrough — building
+the image, `docker-compose.prod.yml`, HTTPS setup (required for the QR
+scanner to work off `localhost`), backups, redeploys, and troubleshooting.
+Quick version, once `.env` is configured for production:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml exec app npm run db:seed
+```
 
 ## Admin workflow
 
