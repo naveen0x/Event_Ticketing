@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Field";
+import { ORGANIZATIONS } from "@/lib/validators";
 
 export function RegistrationForm({ slug }: { slug: string }) {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [epfNumber, setEpfNumber] = useState("");
   const [organization, setOrganization] = useState("");
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -24,7 +26,7 @@ export function RegistrationForm({ slug }: { slug: string }) {
     const res = await fetch(`/api/public/events/${slug}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, phone, organization, notes }),
+      body: JSON.stringify({ fullName, email, phone, epfNumber, organization, notes }),
     });
     const data = await res.json().catch(() => ({}));
     setLoading(false);
@@ -90,12 +92,26 @@ export function RegistrationForm({ slug }: { slug: string }) {
           onChange={(e) => setPhone(e.target.value)}
         />
       </FormField>
-      <FormField label="Organization (optional)" htmlFor="organization" error={errors.organization}>
-        <Input
+      <FormField label="EPF Number (optional)" htmlFor="epfNumber" error={errors.epfNumber}>
+        <Input id="epfNumber" value={epfNumber} onChange={(e) => setEpfNumber(e.target.value)} />
+      </FormField>
+      <FormField label="Organization" htmlFor="organization" error={errors.organization}>
+        <select
           id="organization"
+          required
           value={organization}
           onChange={(e) => setOrganization(e.target.value)}
-        />
+          className="block w-full rounded-md border-0 bg-white px-3 py-2 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+        >
+          <option value="" disabled>
+            Select organization
+          </option>
+          {ORGANIZATIONS.map((org) => (
+            <option key={org} value={org}>
+              {org}
+            </option>
+          ))}
+        </select>
       </FormField>
       <FormField label="Notes (optional)" htmlFor="notes" error={errors.notes}>
         <Textarea id="notes" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />

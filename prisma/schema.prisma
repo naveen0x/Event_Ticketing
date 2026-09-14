@@ -74,6 +74,7 @@ model Registration {
   fullName       String
   email          String
   phone          String?
+  epfNumber      String?
   organization   String?
   notes          String?
   status         RegistrationStatus @default(PENDING)

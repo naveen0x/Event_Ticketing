@@ -20,11 +20,14 @@ export const eventSchema = z
     path: ["endAt"],
   });
 
+export const ORGANIZATIONS = ["AES", "Cleantech"] as const;
+
 export const registrationSchema = z.object({
   fullName: z.string().trim().min(2).max(160),
   email: z.string().trim().email(),
   phone: z.string().trim().min(7).max(40),
-  organization: z.string().trim().max(160).optional().or(z.literal("")),
+  epfNumber: z.string().trim().max(40).optional().or(z.literal("")),
+  organization: z.enum(ORGANIZATIONS),
   notes: z.string().trim().max(2000).optional().or(z.literal("")),
 });
 

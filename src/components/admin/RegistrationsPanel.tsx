@@ -48,6 +48,7 @@ export function RegistrationsPanel({
       (r) =>
         r.fullName.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
+        r.epfNumber?.toLowerCase().includes(q) ||
         r.ticket?.ticketCode.toLowerCase().includes(q)
     );
   }, [registrations, tab, query]);
@@ -201,6 +202,7 @@ export function RegistrationsPanel({
               <tr>
                 <th className="px-4 py-2 text-left font-medium text-slate-500">Attendee</th>
                 <th className="px-4 py-2 text-left font-medium text-slate-500">Email</th>
+                <th className="px-4 py-2 text-left font-medium text-slate-500">EPF Number</th>
                 <th className="px-4 py-2 text-left font-medium text-slate-500">Submitted</th>
                 <th className="px-4 py-2 text-left font-medium text-slate-500">Status</th>
                 <th className="px-4 py-2 text-left font-medium text-slate-500">Ticket</th>
@@ -220,6 +222,7 @@ export function RegistrationsPanel({
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-700">{reg.email}</td>
+                    <td className="px-4 py-3 text-slate-500">{reg.epfNumber ?? "—"}</td>
                     <td className="px-4 py-3 text-slate-500">
                       {formatDateTime(new Date(reg.createdAt))}
                     </td>

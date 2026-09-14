@@ -50,6 +50,7 @@ export function AttendanceTable({
       (r) =>
         r.fullName.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
+        r.epfNumber?.toLowerCase().includes(q) ||
         r.ticket?.ticketCode.toLowerCase().includes(q)
     );
   }, [rows, tab, query]);
@@ -81,10 +82,11 @@ export function AttendanceTable({
 
   function exportCsv() {
     const csv = toCsv(
-      ["Full name", "Email", "Organization", "Ticket code", "Status", "Checked in at"],
+      ["Full name", "Email", "EPF Number", "Organization", "Ticket code", "Status", "Checked in at"],
       filtered.map((row) => [
         row.fullName,
         row.email,
+        row.epfNumber ?? "",
         row.organization ?? "",
         row.ticket?.ticketCode ?? "",
         isAttended(row) ? "Attended" : "Not attended",
@@ -139,6 +141,7 @@ export function AttendanceTable({
           <thead className="bg-slate-50">
             <tr>
               <th className="px-4 py-2 text-left font-medium text-slate-500">Attendee</th>
+              <th className="px-4 py-2 text-left font-medium text-slate-500">EPF Number</th>
               <th className="px-4 py-2 text-left font-medium text-slate-500">Ticket</th>
               <th className="px-4 py-2 text-left font-medium text-slate-500">Status</th>
               <th className="px-4 py-2 text-left font-medium text-slate-500">Checked in</th>
@@ -152,6 +155,7 @@ export function AttendanceTable({
                   <div className="font-medium text-slate-900">{row.fullName}</div>
                   <div className="text-xs text-slate-500">{row.email}</div>
                 </td>
+                <td className="px-4 py-3 text-slate-500">{row.epfNumber ?? "—"}</td>
                 <td className="px-4 py-3 font-mono text-xs text-slate-600">
                   {row.ticket?.ticketCode ?? "—"}
                 </td>
@@ -177,7 +181,7 @@ export function AttendanceTable({
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
                   No matching attendees.
                 </td>
               </tr>
