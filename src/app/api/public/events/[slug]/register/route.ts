@@ -35,7 +35,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         fullName: parsed.data.fullName,
         email: parsed.data.email.toLowerCase(),
         phone: parsed.data.phone || null,
-        epfNumber: parsed.data.epfNumber || null,
+        epfNumber: parsed.data.epfNumber,
         organization: parsed.data.organization,
         notes: parsed.data.notes || null,
       },

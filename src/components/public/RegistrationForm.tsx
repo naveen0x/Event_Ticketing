@@ -92,8 +92,13 @@ export function RegistrationForm({ slug }: { slug: string }) {
           onChange={(e) => setPhone(e.target.value)}
         />
       </FormField>
-      <FormField label="EPF Number (optional)" htmlFor="epfNumber" error={errors.epfNumber}>
-        <Input id="epfNumber" value={epfNumber} onChange={(e) => setEpfNumber(e.target.value)} />
+      <FormField label="EPF Number" htmlFor="epfNumber" error={errors.epfNumber}>
+        <Input
+          id="epfNumber"
+          required
+          value={epfNumber}
+          onChange={(e) => setEpfNumber(e.target.value)}
+        />
       </FormField>
       <FormField label="Organization" htmlFor="organization" error={errors.organization}>
         <select
