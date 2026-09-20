@@ -67,7 +67,7 @@ for **local development only** (Postgres alone, no app container; you run
 ## 1. Get the code onto the server
 
 ```bash
-git clone <your-repo-url> /opt/event-ticketing
+git clone https://github.com/naveen0x/Event_Ticketing.git /opt/event-ticketing
 cd /opt/event-ticketing
 ```
 
@@ -81,7 +81,7 @@ Edit `.env`:
 
 ```bash
 AUTH_SECRET="$(openssl rand -hex 32)"          # generate a real one — don't ship the placeholder
-NEXTAUTH_URL="https://your-domain.com"
+NEXTAUTH_URL="https://abans.neuronex.biz"
 APP_URL="https://your-domain.com"
 SEED_ADMIN_EMAIL="you@your-domain.com"
 SEED_ADMIN_PASSWORD="<something strong>"
