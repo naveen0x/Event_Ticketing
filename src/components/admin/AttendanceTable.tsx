@@ -82,12 +82,13 @@ export function AttendanceTable({
 
   function exportCsv() {
     const csv = toCsv(
-      ["Full name", "Email", "EPF Number", "Organization", "Ticket code", "Status", "Checked in at"],
+      ["Full name", "Email", "EPF Number", "Organization", "Type", "Ticket code", "Status", "Checked in at"],
       filtered.map((row) => [
         row.fullName,
         row.email,
         row.epfNumber ?? "",
         row.organization ?? "",
+        row.isGuest ? "Guest" : "Registered",
         row.ticket?.ticketCode ?? "",
         isAttended(row) ? "Attended" : "Not attended",
         row.ticket?.attendance?.checkedInAt
@@ -152,7 +153,14 @@ export function AttendanceTable({
             {filtered.map((row) => (
               <tr key={row.id}>
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-900">{row.fullName}</div>
+                  <div className="font-medium text-slate-900">
+                    {row.fullName}
+                    {row.isGuest && (
+                      <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700">
+                        Guest
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-slate-500">{row.email}</div>
                 </td>
                 <td className="px-4 py-3 text-slate-500">{row.epfNumber ?? "—"}</td>

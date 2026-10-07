@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin, handleApiError, ApiError } from "@/lib/api";
 import { generateQrToken, generateTicketCode } from "@/lib/tokens";
-import { sendTicketEmail } from "@/lib/email";
+import { sendGuestInvitationEmail, sendTicketEmail } from "@/lib/email";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -64,7 +64,8 @@ export async function POST(_request: NextRequest, { params }: Params) {
     const ticketUrl = `${process.env.APP_URL ?? ""}/ticket/${updated.ticket.ticketCode}`;
 
     try {
-      await sendTicketEmail({
+      const sendEmail = registration.isGuest ? sendGuestInvitationEmail : sendTicketEmail;
+      await sendEmail({
         to: registration.email,
         attendeeName: registration.fullName,
         eventTitle: registration.event.title,

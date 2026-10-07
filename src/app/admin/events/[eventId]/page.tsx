@@ -74,7 +74,7 @@ export default async function EventDetailPage({
         </div>
       </Card>
 
-      <RegistrationsPanel initialRegistrations={registrations} />
+      <RegistrationsPanel eventId={event.id} initialRegistrations={registrations} />
     </div>
   );
 }

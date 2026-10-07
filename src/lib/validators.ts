@@ -31,6 +31,13 @@ export const registrationSchema = z.object({
   notes: z.string().trim().max(2000).optional().or(z.literal("")),
 });
 
+export const guestSchema = z.object({
+  fullName: z.string().trim().min(2).max(160),
+  email: z.string().trim().email(),
+  phone: z.string().trim().min(7).max(40),
+  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+});
+
 export const rejectSchema = z.object({
   reason: z.string().trim().max(500).optional().or(z.literal("")),
 });
@@ -68,3 +75,4 @@ export const sendTestEmailSchema = z.object({
 
 export type EventInput = z.infer<typeof eventSchema>;
 export type RegistrationInput = z.infer<typeof registrationSchema>;
+export type GuestInput = z.infer<typeof guestSchema>;

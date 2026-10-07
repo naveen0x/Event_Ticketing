@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { formatDateTime } from "@/lib/format";
+import { AddGuestDialog } from "@/components/admin/AddGuestDialog";
 
 type RegistrationWithTicket = Registration & {
   ticket: (Ticket & { attendance: Attendance | null }) | null;
@@ -23,8 +24,10 @@ const TABS: { key: Tab; label: string }[] = [
 ];
 
 export function RegistrationsPanel({
+  eventId,
   initialRegistrations,
 }: {
+  eventId: string;
   initialRegistrations: RegistrationWithTicket[];
 }) {
   const [registrations, setRegistrations] = useState(initialRegistrations);
@@ -33,6 +36,7 @@ export function RegistrationsPanel({
   const [pending, setPending] = useState<{ id: string; action: RowAction } | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [addingGuest, setAddingGuest] = useState(false);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
@@ -185,13 +189,28 @@ export function RegistrationsPanel({
             </button>
           ))}
         </div>
-        <Input
-          placeholder="Search by name, email or ticket code"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="max-w-xs"
-        />
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <Input
+            placeholder="Search by name, email or ticket code"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="max-w-xs"
+          />
+          <Button className="whitespace-nowrap" onClick={() => setAddingGuest(true)}>
+            Add guest
+          </Button>
+        </div>
       </div>
+
+      <AddGuestDialog
+        eventId={eventId}
+        open={addingGuest}
+        onClose={() => setAddingGuest(false)}
+        onAdded={(reg) => {
+          setRegistrations((prev) => [reg, ...prev]);
+          setTab("APPROVED");
+        }}
+      />
 
       {visible.length === 0 ? (
         <p className="py-8 text-center text-sm text-slate-500">No registrations in this view.</p>
@@ -216,9 +235,19 @@ export function RegistrationsPanel({
                 return (
                   <tr key={reg.id}>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-slate-900">{reg.fullName}</div>
+                      <div className="font-medium text-slate-900">
+                        {reg.fullName}
+                        {reg.isGuest && (
+                          <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700">
+                            Guest
+                          </span>
+                        )}
+                      </div>
                       {reg.organization && (
                         <div className="text-xs text-slate-500">{reg.organization}</div>
+                      )}
+                      {reg.isGuest && reg.phone && (
+                        <div className="text-xs text-slate-500">{reg.phone}</div>
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-700">{reg.email}</td>
