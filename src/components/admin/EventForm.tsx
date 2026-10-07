@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { FormField, Input, Textarea, Label } from "@/components/ui/Field";
+import { APP_TIME_ZONE, fromDatetimeLocal, toDatetimeLocal } from "@/lib/format";
 
 type EventFormValues = {
   id?: string;
@@ -16,15 +17,6 @@ type EventFormValues = {
   capacity: string;
   registrationOpen: boolean;
 };
-
-function toDatetimeLocal(value?: Date | string | null): string {
-  if (!value) return "";
-  const date = new Date(value);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
-    date.getHours()
-  )}:${pad(date.getMinutes())}`;
-}
 
 export function EventForm({
   initial,
@@ -95,8 +87,8 @@ export function EventForm({
       title: values.title,
       description: values.description,
       location: values.location,
-      startAt: values.startAt ? new Date(values.startAt).toISOString() : undefined,
-      endAt: values.endAt ? new Date(values.endAt).toISOString() : null,
+      startAt: values.startAt ? fromDatetimeLocal(values.startAt) : undefined,
+      endAt: values.endAt ? fromDatetimeLocal(values.endAt) : null,
       capacity: values.capacity ? Number(values.capacity) : null,
       registrationOpen: values.registrationOpen,
     };
@@ -160,6 +152,7 @@ export function EventForm({
         />
       </FormField>
 
+      <p className="-mb-3 text-xs text-slate-500">Times are in {APP_TIME_ZONE}.</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="Start" htmlFor="startAt" error={errors.startAt}>
           <Input
